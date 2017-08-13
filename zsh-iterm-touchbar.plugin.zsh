@@ -125,7 +125,7 @@ function _displayDefault() {
     echo -ne "\033]1337;SetKeyLabel=F4=✉️ push\a";
 
     # bind git actions
-    bindkey -s '^[OQ' 'git branch -a \n'
+    bindkey -s '^[OQ' 'fbr \n'
     bindkey -s '^[OR' 'git status \n'
     bindkey -s '^[OS' "git push origin $(git_current_branch) \n"
   fi
@@ -142,7 +142,12 @@ function _displayNpmScripts() {
   # find available npm run scripts only if new directory
   if [[ $lastPackageJsonPath != $(echo "$(pwd)/package.json") ]]; then
     lastPackageJsonPath=$(echo "$(pwd)/package.json")
-    npmScripts=($(node -e "console.log(Object.keys($(npm run --json)).filter(name => !name.includes(':')).sort((a, b) => a.localeCompare(b)).filter((name, idx) => idx < 12).join(' '))"))
+    if [[ 'haven' == $(echo $(pwd) | awk -F "/" '{print $NF}') ]]; then
+      npmScripts=($(node -e "console.log(Object.keys($(npm run --json)).filter((name) => {return name.split(':').pop() != 'production' && (name === 'build:valora' || name === 'compile:ts' || name === 'build:customer' || name === 'build')}).sort((a, b) => a.localeCompare(b)).filter((name, idx) => idx < 20).join(' '))"))
+    else
+      npmScripts=($(node -e "console.log(Object.keys($(npm run --json)).filter(name => !name.includes(':')).sort((a, b) => a.localeCompare(b)).filter((name, idx) => idx < 12).join(' '))"))
+    fi
+
   fi
 
   _clearTouchbar
